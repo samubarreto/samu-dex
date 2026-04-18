@@ -16,6 +16,7 @@ import type { PokemonListItem, SortDirection, SortField } from '../../types/poke
 import {
   ClearFiltersButton,
   FiltersContent,
+  FiltersContentInner,
   FiltersHeader,
   FiltersSection,
   FiltersToggle,
@@ -223,14 +224,16 @@ export default function HomePage() {
           ) : null}
         </FiltersHeader>
         <FiltersContent $open={filtersOpen}>
-          <PokeTypeFilter
-            selectedTypes={selectedTypes}
-            onTypesChange={handleTypesChange}
-          />
-          <PokeClassificationFilter
-            selectedClassifications={selectedClassifications}
-            onClassificationsChange={handleClassificationsChange}
-          />
+          <FiltersContentInner>
+            <PokeTypeFilter
+              selectedTypes={selectedTypes}
+              onTypesChange={handleTypesChange}
+            />
+            <PokeClassificationFilter
+              selectedClassifications={selectedClassifications}
+              onClassificationsChange={handleClassificationsChange}
+            />
+          </FiltersContentInner>
         </FiltersContent>
       </FiltersSection>
 

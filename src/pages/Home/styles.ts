@@ -58,7 +58,6 @@ type FiltersContentProps = { $open: boolean }
 
 export const FiltersContent = styled.div<FiltersContentProps>`
 	display: grid;
-	gap: 16px;
 	grid-template-rows: ${({ $open }) => ($open ? '1fr' : '0fr')};
 	opacity: ${({ $open }) => ($open ? 1 : 0)};
 	overflow: hidden;
@@ -69,6 +68,12 @@ export const FiltersContent = styled.div<FiltersContentProps>`
 		min-height: 0;
 		overflow: hidden;
 	}
+`
+
+export const FiltersContentInner = styled.div`
+	display: grid;
+	gap: 16px;
+	min-height: 0;
 `
 
 export const ClearFiltersButton = styled.button`
