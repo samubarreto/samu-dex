@@ -1,3 +1,3 @@
 # Samudex
 
-> Vibedex desnecessariamente cheias de funcionalidades
+- Frontend de Pokedéx vibecodada desnecessariamente cheia de funcionalidades
