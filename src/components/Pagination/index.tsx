@@ -8,7 +8,7 @@ type PaginationProps = {
   totalPages: number
 }
 
-const MOBILE_QUERY = '(max-width: 480px)'
+const MOBILE_QUERY = '(max-width: 520px)'
 
 function subscribeMediaQuery(callback: () => void) {
   const mql = window.matchMedia(MOBILE_QUERY)
