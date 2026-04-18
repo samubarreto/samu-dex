@@ -90,15 +90,36 @@ function PaletteIcon({ size = 18 }: IconProps) {
   )
 }
 
-const themeAccentColors: Record<Theme, string> = {
-  light: '#0f7b6c',
-  dark: '#34d399',
-  nord_light: '#8fbcbb',
-  solarized_light: '#859900',
-  modern_ink: '#ff360d',
-  rose_pine_dawn: '#56949f',
-  soaring_skies: '#55c6f0',
-  tangerine: '#fe5503',
+function StarIcon({ size = 16 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3.5L14.781 9.136L21 10.04L16.5 14.427L17.562 20.621L12 17.697L6.438 20.621L7.5 14.427L3 10.04L9.219 9.136L12 3.5Z" />
+    </svg>
+  )
+}
+
+function DiceIcon({ size = 16 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <circle cx="9" cy="9" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="9" r="1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="15" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="15" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+const themeSwatches: Record<Theme, { background: string; borderColor: string }> = {
+  light: { background: '#e5e7eb', borderColor: '#cbd5e1' },
+  dark: { background: '#374151', borderColor: '#1f2937' },
+  nord_light: { background: '#8fbcbb', borderColor: '#5e81ac' },
+  solarized_light: { background: '#859900', borderColor: '#2aa198' },
+  modern_ink: { background: '#ff360d', borderColor: '#cc2b0a' },
+  rose_pine_dawn: { background: '#56949f', borderColor: '#c4a7e7' },
+  soaring_skies: { background: '#55c6f0', borderColor: '#1e107a' },
+  tangerine: { background: '#fe5503', borderColor: '#ff9562' },
 }
 
 export default function Header() {
@@ -208,9 +229,11 @@ export default function Header() {
                 to="/favourites"
                 $active={location.pathname.startsWith('/favourites')}
               >
+                <StarIcon />
                 {translate('header.navigation.favourites')}
               </NavigationLink>
               <RandomButton type="button" onClick={handleRandomNavigation}>
+                <DiceIcon />
                 {translate('header.navigation.random')}
               </RandomButton>
             </Navigation>
@@ -244,7 +267,7 @@ export default function Header() {
                     aria-selected={t === theme}
                     onClick={() => handleSelectTheme(t)}
                   >
-                    <ThemeColorDot style={{ background: themeAccentColors[t] }} />
+                    <ThemeColorDot style={themeSwatches[t]} />
                     <ItemLabel>
                       {translate(`header.theme.options.${t}`)}
                     </ItemLabel>
@@ -353,9 +376,11 @@ export default function Header() {
             to="/favourites"
             $active={location.pathname.startsWith('/favourites')}
           >
+            <StarIcon />
             {translate('header.navigation.favourites')}
           </DrawerNavLink>
           <DrawerRandomButton type="button" onClick={handleRandomNavigation}>
+            <DiceIcon />
             {translate('header.navigation.random')}
           </DrawerRandomButton>
         </DrawerNav>
@@ -424,7 +449,7 @@ export default function Header() {
                 aria-selected={t === theme}
                 onClick={() => handleSelectTheme(t)}
               >
-                <ThemeColorDot style={{ background: themeAccentColors[t] }} />
+                <ThemeColorDot style={themeSwatches[t]} />
                 <ItemLabel>
                   {translate(`header.theme.options.${t}`)}
                 </ItemLabel>

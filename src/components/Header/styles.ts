@@ -180,6 +180,7 @@ export const DrawerNav = styled.nav`
 const drawerItemStyles = css`
   display: flex;
   align-items: center;
+  gap: 10px;
   min-height: 48px;
   padding: 0 16px;
   border-radius: var(--radius-sm);
@@ -312,6 +313,7 @@ const interactiveItemStyles = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   min-height: 44px;
   padding: 0 16px;
   border-radius: 999px;
