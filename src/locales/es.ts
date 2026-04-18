@@ -21,6 +21,11 @@ const es = {
 				es: 'Español',
 				it: 'Italiano',
 				ja: 'Japonés',
+				zh: 'Chino (mandarín)',
+				th: 'Tailandés',
+				ka: 'Georgiano',
+				mn: 'Mongol',
+				hy: 'Armenio',
 			},
 		},
 		theme: {

@@ -21,6 +21,11 @@ const it = {
 				es: 'Spagnolo',
 				it: 'Italiano',
 				ja: 'Giapponese',
+				zh: 'Cinese (mandarino)',
+				th: 'Thailandese',
+				ka: 'Georgiano',
+				mn: 'Mongolo',
+				hy: 'Armeno',
 			},
 		},
 		theme: {

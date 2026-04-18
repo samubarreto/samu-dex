@@ -1,9 +1,14 @@
 import en from './en'
 import es from './es'
+import hy from './hy'
 import it from './it'
 import ja from './ja'
+import ka from './ka'
+import mn from './mn'
 import pt from './pt'
+import th from './th'
 import type { TranslationDictionary } from './types'
+import zh from './zh'
 
 export const locales = {
   en,
@@ -11,6 +16,11 @@ export const locales = {
   es,
   it,
   ja,
+  zh,
+  th,
+  ka,
+  mn,
+  hy,
 } satisfies Record<string, TranslationDictionary>
 
 export type Locale = keyof typeof locales

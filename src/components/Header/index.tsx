@@ -50,6 +50,11 @@ const localeFlagCodes: Record<Locale, string> = {
   es: 'es',
   it: 'it',
   ja: 'jp',
+  zh: 'cn',
+  th: 'th',
+  ka: 'ge',
+  mn: 'mn',
+  hy: 'am',
 }
 
 const flagUrl = (code: string) =>

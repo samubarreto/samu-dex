@@ -21,6 +21,11 @@ const en = {
 				es: 'Spanish',
 				it: 'Italian',
 				ja: 'Japanese',
+				zh: 'Chinese (Mandarin)',
+				th: 'Thai',
+				ka: 'Georgian',
+				mn: 'Mongolian',
+				hy: 'Armenian',
 			},
 		},
 		theme: {
