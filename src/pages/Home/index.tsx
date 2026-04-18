@@ -28,8 +28,8 @@ import {
   StateTitle,
 } from './styles'
 
-const DEFAULT_ITEMS_PER_PAGE = 50
-const MAX_ITEMS_PER_PAGE = 500
+const DEFAULT_ITEMS_PER_PAGE = 10
+const MAX_ITEMS_PER_PAGE = 100
 
 export default function HomePage() {
   const { translate } = useTranslation()
