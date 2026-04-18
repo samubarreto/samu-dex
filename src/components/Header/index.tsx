@@ -117,8 +117,8 @@ const themeSwatches: Record<Theme, { background: string; borderColor: string }> 
   nord_light: { background: '#8fbcbb', borderColor: '#5e81ac' },
   solarized_light: { background: '#859900', borderColor: '#2aa198' },
   modern_ink: { background: '#ff360d', borderColor: '#cc2b0a' },
-  rose_pine_dawn: { background: '#56949f', borderColor: '#c4a7e7' },
-  soaring_skies: { background: '#55c6f0', borderColor: '#1e107a' },
+  husqy: { background: '#c58aff', borderColor: '#972fff' },
+  aurora: { background: '#00e980', borderColor: '#245c69' },
   tangerine: { background: '#fe5503', borderColor: '#ff9562' },
 }
 

@@ -1,11 +1,16 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
-export type Theme = 'light' | 'dark' | 'nord_light' | 'solarized_light' | 'modern_ink' | 'rose_pine_dawn' | 'soaring_skies' | 'tangerine'
+export type Theme = 'light' | 'dark' | 'nord_light' | 'solarized_light' | 'modern_ink' | 'husqy' | 'aurora' | 'tangerine'
 
 const STORAGE_KEY = 'app-theme'
 const THEME_EVENT = 'app-theme-change'
 
-const SUPPORTED_THEMES: Theme[] = ['light', 'dark', 'nord_light', 'solarized_light', 'modern_ink', 'rose_pine_dawn', 'soaring_skies', 'tangerine']
+const LEGACY_THEME_MAP: Record<string, Theme> = {
+  rose_pine_dawn: 'husqy',
+  soaring_skies: 'aurora',
+}
+
+const SUPPORTED_THEMES: Theme[] = ['light', 'dark', 'nord_light', 'solarized_light', 'modern_ink', 'husqy', 'aurora', 'tangerine']
 
 let activeTheme = resolveInitialTheme()
 
@@ -32,7 +37,21 @@ function readStoredTheme(): Theme | null {
   try {
     const value = window.localStorage.getItem(STORAGE_KEY)
 
-    return value && SUPPORTED_THEMES.includes(value as Theme) ? (value as Theme) : null
+    if (!value) {
+      return null
+    }
+
+    const normalizedTheme = LEGACY_THEME_MAP[value] ?? value
+
+    if (!SUPPORTED_THEMES.includes(normalizedTheme as Theme)) {
+      return null
+    }
+
+    if (normalizedTheme !== value) {
+      window.localStorage.setItem(STORAGE_KEY, normalizedTheme)
+    }
+
+    return normalizedTheme as Theme
   } catch {
     return null
   }
