@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import type { Pokemon } from 'pokenode-ts'
 import { useFavourites } from '../../hooks/useFavourites'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -93,10 +93,62 @@ function formatCode(id: number) {
   return `#${String(id).padStart(4, '0')}`
 }
 
-const MAX_POKEMON_ID = 1025
+const VALID_POKEMON_ID_RANGES = [
+  { start: 1, end: 1025 },
+  { start: 10001, end: 10325 },
+] as const
+
+function isValidPokemonId(id: number) {
+  return VALID_POKEMON_ID_RANGES.some((range) => id >= range.start && id <= range.end)
+}
+
+function getAdjacentPokemonId(id: number, direction: -1 | 1) {
+  if (!Number.isInteger(id) || !isValidPokemonId(id)) {
+    return null
+  }
+
+  if (direction === -1) {
+    if (id === VALID_POKEMON_ID_RANGES[1].start) {
+      return VALID_POKEMON_ID_RANGES[0].end
+    }
+
+    const previousId = id - 1
+
+    return isValidPokemonId(previousId) ? previousId : null
+  }
+
+  if (id === VALID_POKEMON_ID_RANGES[0].end) {
+    return VALID_POKEMON_ID_RANGES[1].start
+  }
+
+  const nextId = id + 1
+
+  return isValidPokemonId(nextId) ? nextId : null
+}
+
+function buildDetailPath(id: number | null) {
+  return id === null ? '.' : `/details/${id}`
+}
+
+function formatNavigationId(id: number | null) {
+  return String(id ?? 0).padStart(4, '0')
+}
+
+function isEditableElement(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false
+  }
+
+  if (target.isContentEditable) {
+    return true
+  }
+
+  return ['input', 'textarea', 'select'].includes(target.tagName.toLowerCase())
+}
 
 export default function PokeDetailedPage() {
   const { pokemonId } = useParams()
+  const navigate = useNavigate()
   const { translate } = useTranslation()
   const { isFavourite, toggleFavourite } = useFavourites()
   const [pokemon, setPokemon] = useState<Pokemon | null>(null)
@@ -105,9 +157,12 @@ export default function PokeDetailedPage() {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [showBlur, setShowBlur] = useState(true)
   const numericId = Number(pokemonId)
+  const previousPokemonId = getAdjacentPokemonId(numericId, -1)
+  const nextPokemonId = getAdjacentPokemonId(numericId, 1)
 
   useEffect(() => {
-    if (!pokemonId || !Number.isFinite(numericId)) {
+    if (!pokemonId || !Number.isInteger(numericId) || !isValidPokemonId(numericId)) {
+      setPokemon(null)
       setHasError(true)
       setIsLoading(false)
       return
@@ -120,6 +175,7 @@ export default function PokeDetailedPage() {
     async function load() {
       setIsLoading(true)
       setHasError(false)
+      setPokemon(null)
       setImageLoaded(false)
       setShowBlur(true)
 
@@ -132,6 +188,7 @@ export default function PokeDetailedPage() {
           return
         }
 
+        setPokemon(null)
         setHasError(true)
       } finally {
         if (!controller.signal.aborted) {
@@ -147,11 +204,48 @@ export default function PokeDetailedPage() {
     }
   }, [pokemonId, numericId])
 
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.altKey || event.ctrlKey || event.metaKey || isEditableElement(event.target)) {
+        return
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        navigate('/')
+        return
+      }
+
+      if (event.key === 'ArrowLeft' && previousPokemonId !== null) {
+        event.preventDefault()
+        navigate(`/details/${previousPokemonId}`)
+        return
+      }
+
+      if (event.key === 'ArrowRight' && nextPokemonId !== null) {
+        event.preventDefault()
+        navigate(`/details/${nextPokemonId}`)
+        return
+      }
+
+      if (event.key.toLowerCase() === 'f' && !event.repeat && pokemon) {
+        event.preventDefault()
+        toggleFavourite(toPokemonListItem(pokemon))
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [navigate, nextPokemonId, pokemon, previousPokemonId, toggleFavourite])
+
   const listItem: PokemonListItem | null = pokemon
     ? toPokemonListItem(pokemon)
     : null
 
-  const favourite = listItem ? isFavourite(pokemon!.id) : false
+  const favourite = listItem ? isFavourite(listItem.id) : false
 
   if (isLoading) {
     return (
@@ -161,16 +255,18 @@ export default function PokeDetailedPage() {
 
         <PokemonNav>
           <PokemonNavLink
-            to={`/details/${numericId - 1}`}
-            aria-disabled={numericId <= 1 ? 'true' : undefined}
+            to={buildDetailPath(previousPokemonId)}
+            aria-disabled={previousPokemonId === null ? 'true' : undefined}
+            tabIndex={previousPokemonId === null ? -1 : undefined}
           >
-            {translate('detailed.prev', { params: { id: String(numericId - 1).padStart(4, '0') } })}
+            {translate('detailed.prev', { params: { id: formatNavigationId(previousPokemonId) } })}
           </PokemonNavLink>
           <PokemonNavLink
-            to={`/details/${numericId + 1}`}
-            aria-disabled={numericId >= MAX_POKEMON_ID ? 'true' : undefined}
+            to={buildDetailPath(nextPokemonId)}
+            aria-disabled={nextPokemonId === null ? 'true' : undefined}
+            tabIndex={nextPokemonId === null ? -1 : undefined}
           >
-            {translate('detailed.next', { params: { id: String(numericId + 1).padStart(4, '0') } })}
+            {translate('detailed.next', { params: { id: formatNavigationId(nextPokemonId) } })}
           </PokemonNavLink>
         </PokemonNav>
 
@@ -263,16 +359,18 @@ export default function PokeDetailedPage() {
         <BackLink to="/">{translate('detailed.backToHome')}</BackLink>
         <PokemonNav>
           <PokemonNavLink
-            to={`/details/${numericId - 1}`}
-            aria-disabled={numericId <= 1 ? 'true' : undefined}
+            to={buildDetailPath(previousPokemonId)}
+            aria-disabled={previousPokemonId === null ? 'true' : undefined}
+            tabIndex={previousPokemonId === null ? -1 : undefined}
           >
-            {translate('detailed.prev', { params: { id: String(numericId - 1).padStart(4, '0') } })}
+            {translate('detailed.prev', { params: { id: formatNavigationId(previousPokemonId) } })}
           </PokemonNavLink>
           <PokemonNavLink
-            to={`/details/${numericId + 1}`}
-            aria-disabled={numericId >= MAX_POKEMON_ID ? 'true' : undefined}
+            to={buildDetailPath(nextPokemonId)}
+            aria-disabled={nextPokemonId === null ? 'true' : undefined}
+            tabIndex={nextPokemonId === null ? -1 : undefined}
           >
-            {translate('detailed.next', { params: { id: String(numericId + 1).padStart(4, '0') } })}
+            {translate('detailed.next', { params: { id: formatNavigationId(nextPokemonId) } })}
           </PokemonNavLink>
         </PokemonNav>
       </PokemonNav>
