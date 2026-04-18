@@ -2,7 +2,7 @@
 
 const en = {
 	header: {
-		brand: 'Samudex',
+		brand: 'Samudéx',
 		navigation: {
 			label: 'Main navigation',
 			home: 'Home',

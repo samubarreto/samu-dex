@@ -2,7 +2,7 @@ import type { TranslationDictionary } from './types'
 
 const pt = {
 	header: {
-		brand: 'Samudex',
+		brand: 'Samudéx',
 		navigation: {
 			label: 'Navegação principal',
 			home: 'Início',

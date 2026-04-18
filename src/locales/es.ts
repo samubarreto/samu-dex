@@ -2,7 +2,7 @@
 
 const es = {
 	header: {
-		brand: 'Samudex',
+		brand: 'Samudéx',
 		navigation: {
 			label: 'Navegación principal',
 			home: 'Inicio',
