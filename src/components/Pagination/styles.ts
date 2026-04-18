@@ -26,6 +26,7 @@ export const Container = styled.nav`
 export const Summary = styled.p`
   margin: 0;
   color: var(--muted);
+  text-align: center;
 `
 
 export const Controls = styled.div`
@@ -33,10 +34,10 @@ export const Controls = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
 
   @media (max-width: 480px) {
     gap: 6px;
-    justify-content: center;
   }
 `
 
@@ -46,7 +47,7 @@ export const PageButton = styled.button<PageButtonProps>`
   padding: 0 14px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
-  background: ${({ $active }) => ($active ? 'var(--accent)' : 'rgba(255, 255, 255, 0.72)')};
+  background: ${({ $active }) => ($active ? 'var(--accent)' : 'var(--active-surface)')};
   color: ${({ $active }) => ($active ? '#f8fffd' : 'var(--text)')};
   font-weight: 600;
   box-shadow: ${({ $active }) => ($active ? '0 12px 24px rgba(15, 123, 108, 0.18)' : 'none')};

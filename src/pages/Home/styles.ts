@@ -6,16 +6,14 @@ export const Page = styled.section`
 `
 
 export const FiltersSection = styled.section`
-	display: grid;
-	gap: 16px;
-	padding: 20px 24px;
+	padding: 16px 24px;
 	border: 1px solid var(--border);
 	border-radius: var(--radius-lg);
 	background: var(--surface);
 	box-shadow: var(--shadow-soft);
 
 	@media (max-width: 480px) {
-		padding: 16px;
+		padding: 12px 16px;
 		border-radius: var(--radius-md);
 	}
 `
@@ -24,6 +22,53 @@ export const FiltersHeader = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	min-height: 32px;
+`
+
+export const FiltersToggle = styled.button`
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--muted);
+	font-size: 0.875rem;
+	font-weight: 600;
+	transition: color 160ms ease;
+
+	&:hover {
+		color: var(--text);
+	}
+`
+
+type FiltersToggleCaretProps = { $open: boolean }
+
+export const FiltersToggleCaret = styled.span<FiltersToggleCaretProps>`
+	display: inline-flex;
+	align-items: center;
+	transition: transform 250ms ease;
+	transform: rotate(${({ $open }) => ($open ? '0deg' : '-90deg')});
+`
+
+export const FiltersToggleLabel = styled.span``
+
+type FiltersContentProps = { $open: boolean }
+
+export const FiltersContent = styled.div<FiltersContentProps>`
+	display: grid;
+	gap: 16px;
+	grid-template-rows: ${({ $open }) => ($open ? '1fr' : '0fr')};
+	opacity: ${({ $open }) => ($open ? 1 : 0)};
+	overflow: hidden;
+	transition: grid-template-rows 300ms ease, opacity 250ms ease;
+	padding-top: ${({ $open }) => ($open ? '16px' : '0')};
+
+	& > * {
+		min-height: 0;
+		overflow: hidden;
+	}
 `
 
 export const ClearFiltersButton = styled.button`

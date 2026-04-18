@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
 import { useFavourites } from '../../hooks/useFavourites'
 import { useTranslation } from '../../hooks/useTranslation'
+import { isRequestCanceled } from '../../services/http'
+import { getPokemonTypeMap } from '../../services/pokemon'
 import PokeGrid from '../../components/PokeGrid'
 import {
   EmptyCard,
@@ -15,6 +18,19 @@ import {
 export default function FavouritesPage() {
   const { translate } = useTranslation()
   const { favourites } = useFavourites()
+  const [typeMap, setTypeMap] = useState<Map<number, string[]>>(new Map())
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    getPokemonTypeMap(controller.signal)
+      .then(setTypeMap)
+      .catch((error) => {
+        if (!isRequestCanceled(error)) setTypeMap(new Map())
+      })
+
+    return () => controller.abort()
+  }, [])
 
   return (
     <Page>
@@ -32,7 +48,7 @@ export default function FavouritesPage() {
           <GoHomeLink to="/">{translate('favourites.goHome')}</GoHomeLink>
         </EmptyCard>
       ) : (
-        <PokeGrid pokemons={favourites} />
+        <PokeGrid pokemons={favourites} typeMap={typeMap} />
       )}
     </Page>
   )

@@ -6,30 +6,43 @@ import { useTranslation } from '../../hooks/useTranslation'
 import { isRequestCanceled } from '../../services/http'
 import {
   buildPokemonArtworkUrl,
+  getTypeAdvantages,
   getPokemonById,
+  getTypeWeaknesses,
   toPokemonListItem,
 } from '../../services/pokemon'
+import CopyButton from '../../components/CopyButton'
 import type { PokemonListItem } from '../../types/pokemon'
 import {
   AbilitiesList,
   AbilityBadge,
+  AdvantageArrow,
+  AdvantageItem,
+  AdvantageList,
   Artwork,
   ArtworkImage,
   ArtworkPanel,
+  ArtworkSkeleton,
   BackLink,
   DetailGrid,
   FavButton,
   InfoPanel,
+  MatchupGrid,
   MeasureCard,
   MeasureGrid,
   MeasureLabel,
   MeasureValue,
+  MultiplierTag,
   Page,
+  PageTransitionBlur,
   PokemonCode,
   PokemonHeader,
   PokemonName,
+  PokemonNav,
+  PokemonNavLink,
   Section,
   SectionTitle,
+  SkeletonBlock,
   StateCard,
   StateDescription,
   StateTitle,
@@ -80,6 +93,8 @@ function formatCode(id: number) {
   return `#${String(id).padStart(4, '0')}`
 }
 
+const MAX_POKEMON_ID = 1025
+
 export default function PokeDetailedPage() {
   const { pokemonId } = useParams()
   const { translate } = useTranslation()
@@ -87,6 +102,8 @@ export default function PokeDetailedPage() {
   const [pokemon, setPokemon] = useState<Pokemon | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [showBlur, setShowBlur] = useState(true)
   const numericId = Number(pokemonId)
 
   useEffect(() => {
@@ -103,6 +120,8 @@ export default function PokeDetailedPage() {
     async function load() {
       setIsLoading(true)
       setHasError(false)
+      setImageLoaded(false)
+      setShowBlur(true)
 
       try {
         const nextPokemon = await getPokemonById(resolvedPokemonId, controller.signal)
@@ -115,7 +134,9 @@ export default function PokeDetailedPage() {
 
         setHasError(true)
       } finally {
-        setIsLoading(false)
+        if (!controller.signal.aborted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -135,10 +156,82 @@ export default function PokeDetailedPage() {
   if (isLoading) {
     return (
       <Page>
-        <StateCard>
-          <StateTitle>{translate('detailed.status.loadingTitle')}</StateTitle>
-          <StateDescription>{translate('detailed.status.loadingDescription')}</StateDescription>
-        </StateCard>
+        {showBlur && <PageTransitionBlur key={pokemonId} onAnimationEnd={() => setShowBlur(false)} />}
+        <BackLink to="/">{translate('detailed.backToHome')}</BackLink>
+
+        <PokemonNav>
+          <PokemonNavLink
+            to={`/details/${numericId - 1}`}
+            aria-disabled={numericId <= 1 ? 'true' : undefined}
+          >
+            {translate('detailed.prev', { params: { id: String(numericId - 1).padStart(4, '0') } })}
+          </PokemonNavLink>
+          <PokemonNavLink
+            to={`/details/${numericId + 1}`}
+            aria-disabled={numericId >= MAX_POKEMON_ID ? 'true' : undefined}
+          >
+            {translate('detailed.next', { params: { id: String(numericId + 1).padStart(4, '0') } })}
+          </PokemonNavLink>
+        </PokemonNav>
+
+        <DetailGrid>
+          <ArtworkPanel>
+            <Artwork>
+              <ArtworkSkeleton />
+            </Artwork>
+          </ArtworkPanel>
+
+          <InfoPanel>
+            <PokemonHeader>
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <SkeletonBlock $w="90px" $h="28px" $radius="var(--radius-full)" />
+                <SkeletonBlock $w="55%" $h="44px" />
+              </div>
+              <SkeletonBlock $w="48px" $h="48px" $radius="var(--radius-full)" />
+            </PokemonHeader>
+
+            <TypesRow>
+              <SkeletonBlock $w="76px" $h="32px" $radius="var(--radius-full)" />
+              <SkeletonBlock $w="76px" $h="32px" $radius="var(--radius-full)" />
+            </TypesRow>
+
+            <MeasureGrid>
+              <SkeletonBlock $h="72px" />
+              <SkeletonBlock $h="72px" />
+            </MeasureGrid>
+
+            <Section>
+              <SkeletonBlock $w="45%" $h="22px" />
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonBlock key={i} $h="18px" />
+              ))}
+            </Section>
+
+            <Section>
+              <SkeletonBlock $w="45%" $h="22px" />
+              <TypesRow>
+                <SkeletonBlock $w="110px" $h="34px" $radius="var(--radius-full)" />
+                <SkeletonBlock $w="90px" $h="34px" $radius="var(--radius-full)" />
+              </TypesRow>
+            </Section>
+
+            <MatchupGrid>
+              <Section>
+                <SkeletonBlock $w="60%" $h="20px" />
+                <TypesRow>
+                  <SkeletonBlock $w="72px" $h="30px" $radius="var(--radius-full)" />
+                  <SkeletonBlock $w="72px" $h="30px" $radius="var(--radius-full)" />
+                </TypesRow>
+              </Section>
+              <Section>
+                <SkeletonBlock $w="60%" $h="20px" />
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonBlock key={i} $h="30px" $radius="var(--radius-full)" />
+                ))}
+              </Section>
+            </MatchupGrid>
+          </InfoPanel>
+        </DetailGrid>
       </Page>
     )
   }
@@ -146,6 +239,7 @@ export default function PokeDetailedPage() {
   if (hasError || !pokemon) {
     return (
       <Page>
+        {showBlur && <PageTransitionBlur key={pokemonId} onAnimationEnd={() => setShowBlur(false)} />}
         <StateCard>
           <StateTitle>{translate('detailed.status.errorTitle')}</StateTitle>
           <StateDescription>{translate('detailed.status.errorDescription')}</StateDescription>
@@ -164,23 +258,50 @@ export default function PokeDetailedPage() {
 
   return (
     <Page>
-      <BackLink to="/">{translate('detailed.backToHome')}</BackLink>
+      {showBlur && <PageTransitionBlur key={pokemonId} onAnimationEnd={() => setShowBlur(false)} />}
+      <PokemonNav style={{ justifyContent: 'space-between' }}>
+        <BackLink to="/">{translate('detailed.backToHome')}</BackLink>
+        <PokemonNav>
+          <PokemonNavLink
+            to={`/details/${numericId - 1}`}
+            aria-disabled={numericId <= 1 ? 'true' : undefined}
+          >
+            {translate('detailed.prev', { params: { id: String(numericId - 1).padStart(4, '0') } })}
+          </PokemonNavLink>
+          <PokemonNavLink
+            to={`/details/${numericId + 1}`}
+            aria-disabled={numericId >= MAX_POKEMON_ID ? 'true' : undefined}
+          >
+            {translate('detailed.next', { params: { id: String(numericId + 1).padStart(4, '0') } })}
+          </PokemonNavLink>
+        </PokemonNav>
+      </PokemonNav>
 
       <DetailGrid>
         <ArtworkPanel>
           <Artwork>
-            <ArtworkImage
-              src={buildPokemonArtworkUrl(pokemon.id)}
-              alt={translate('detailed.imageAlt', { params: { name: formatName(pokemon.name) } })}
-            />
-          </Artwork>
+              <ArtworkSkeleton $hidden={imageLoaded} />
+              <ArtworkImage
+                $loaded={imageLoaded}
+                src={buildPokemonArtworkUrl(pokemon.id)}
+                alt={translate('detailed.imageAlt', { params: { name: formatName(pokemon.name) } })}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(true)}
+              />
+            </Artwork>
         </ArtworkPanel>
 
         <InfoPanel>
           <PokemonHeader>
             <div>
               <PokemonCode>{formatCode(pokemon.id)}</PokemonCode>
-              <PokemonName>{formatName(pokemon.name)}</PokemonName>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <PokemonName>{formatName(pokemon.name)}</PokemonName>
+                <CopyButton
+                  text={`${formatCode(pokemon.id)} ${formatName(pokemon.name)}`}
+                  size="md"
+                />
+              </div>
             </div>
             <FavButton
               type="button"
@@ -203,7 +324,7 @@ export default function PokeDetailedPage() {
           <TypesRow>
             {pokemon.types.map((t) => (
               <TypeBadge key={t.type.name} $color={typeColors[t.type.name] ?? '#888'}>
-                {t.type.name}
+                {translate(`home.filters.types.${t.type.name}`)}
               </TypeBadge>
             ))}
           </TypesRow>
@@ -243,6 +364,40 @@ export default function PokeDetailedPage() {
               ))}
             </AbilitiesList>
           </Section>
+
+          <MatchupGrid>
+            <Section>
+              <SectionTitle>{translate('detailed.weaknesses')}</SectionTitle>
+              <TypesRow>
+                {getTypeWeaknesses(pokemon.types.map((t) => t.type.name)).map((w) => (
+                  <TypeBadge key={w.type} $color={typeColors[w.type] ?? '#888'}>
+                    {translate(`home.filters.types.${w.type}`)}
+                    <MultiplierTag>×{w.multiplier}</MultiplierTag>
+                  </TypeBadge>
+                ))}
+              </TypesRow>
+            </Section>
+
+            <Section>
+              <SectionTitle>{translate('detailed.advantages')}</SectionTitle>
+              <AdvantageList>
+                {getTypeAdvantages(pokemon.types.map((t) => t.type.name)).map((a) => (
+                  <AdvantageItem key={a.type}>
+                    {a.sourceTypes!.map((src) => (
+                      <TypeBadge key={src} $color={typeColors[src] ?? '#888'}>
+                        {translate(`home.filters.types.${src}`)}
+                      </TypeBadge>
+                    ))}
+                    <AdvantageArrow>→</AdvantageArrow>
+                    <TypeBadge $color={typeColors[a.type] ?? '#888'}>
+                      {translate(`home.filters.types.${a.type}`)}
+                      <MultiplierTag>×{a.multiplier}</MultiplierTag>
+                    </TypeBadge>
+                  </AdvantageItem>
+                ))}
+              </AdvantageList>
+            </Section>
+          </MatchupGrid>
         </InfoPanel>
       </DetailGrid>
     </Page>

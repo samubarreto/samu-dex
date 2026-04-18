@@ -1,7 +1,47 @@
 import { Link } from 'react-router-dom'
-import { styled } from 'styled-components'
+import { keyframes, styled } from 'styled-components'
+
+const shimmer = keyframes`
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+`
+
+const skeletonBase = `
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-a) 25%,
+    var(--skeleton-b) 50%,
+    var(--skeleton-a) 75%
+  );
+  background-size: 1200px 100%;
+`
+
+export const SkeletonBlock = styled.div<{ $w?: string; $h?: string; $radius?: string }>`
+  width: ${({ $w }) => $w ?? '100%'};
+  height: ${({ $h }) => $h ?? '16px'};
+  border-radius: ${({ $radius }) => $radius ?? 'var(--radius-md)'};
+  ${skeletonBase}
+  animation: ${shimmer} 1.4s infinite linear;
+`
+
+const blurOut = keyframes`
+  0%   { opacity: 1; backdrop-filter: blur(10px); }
+  100% { opacity: 0; backdrop-filter: blur(0px); }
+`
+
+export const PageTransitionBlur = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: var(--bg);
+  animation: ${blurOut} 220ms ease-out forwards;
+  animation-delay: 50ms;
+  opacity: 1;
+`
 
 export const Page = styled.section`
+  position: relative;
   display: grid;
   gap: 24px;
 `
@@ -28,6 +68,43 @@ export const BackLink = styled(Link)`
   }
 `
 
+export const PokemonNav = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+`
+
+export const PokemonNavLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.86rem;
+  transition: all 160ms ease;
+  max-width: 44%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &:hover {
+    color: var(--text);
+    border-color: rgba(34, 49, 63, 0.2);
+    box-shadow: var(--shadow-soft);
+  }
+
+  &[aria-disabled='true'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+`
+
 export const DetailGrid = styled.div`
   display: grid;
   grid-template-columns: minmax(280px, 1fr) minmax(0, 1.2fr);
@@ -51,19 +128,35 @@ export const ArtworkPanel = styled.div`
 `
 
 export const Artwork = styled.div`
+  position: relative;
   aspect-ratio: 1;
   border-radius: var(--radius-md);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(232, 245, 241, 0.8));
+  background: linear-gradient(160deg, var(--artwork-from), var(--artwork-to));
   display: grid;
   place-items: center;
   overflow: hidden;
 `
 
-export const ArtworkImage = styled.img`
+export const ArtworkSkeleton = styled.div<{ $hidden?: boolean }>`
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  ${skeletonBase}
+  animation: ${shimmer} 1.4s infinite linear;
+  transition: opacity 300ms ease;
+  opacity: ${({ $hidden }) => ($hidden ? 0 : 1)};
+  pointer-events: none;
+`
+
+type ArtworkImageProps = { $loaded?: boolean }
+
+export const ArtworkImage = styled.img<ArtworkImageProps>`
   width: min(90%, 320px);
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 20px 30px rgba(24, 44, 53, 0.15));
+  transition: opacity 300ms ease;
+  opacity: ${({ $loaded }) => ($loaded ? 1 : 0)};
 `
 
 export const InfoPanel = styled.div`
@@ -126,11 +219,16 @@ export const TypesRow = styled.div`
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
 `
 
 type TypeBadgeProps = { $color: string }
 
 export const TypeBadge = styled.span<TypeBadgeProps>`
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
   padding: 6px 16px;
   border-radius: var(--radius-full);
   background: ${({ $color }) => `${$color}22`};
@@ -139,6 +237,42 @@ export const TypeBadge = styled.span<TypeBadgeProps>`
   font-weight: 700;
   text-transform: capitalize;
   border: 1px solid ${({ $color }) => `${$color}33`};
+`
+
+export const MultiplierTag = styled.span`
+  font-size: 0.72rem;
+  font-weight: 800;
+  opacity: 0.75;
+  margin-left: 4px;
+`
+
+export const AdvantageList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`
+
+export const AdvantageItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+`
+
+export const AdvantageArrow = styled.span`
+  font-size: 0.88rem;
+  color: var(--muted);
+  flex-shrink: 0;
+`
+
+export const MatchupGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 export const MeasureGrid = styled.div`
@@ -210,18 +344,23 @@ export const StatLabel = styled.span`
 export const StatBar = styled.div`
   height: 8px;
   border-radius: 4px;
-  background: rgba(34, 49, 63, 0.08);
+  background: var(--stat-track);
   overflow: hidden;
 `
 
 type StatBarFillProps = { $percentage: number }
 
+const fillBar = ($percentage: number) => keyframes`
+  from { width: 0%; }
+  to   { width: ${$percentage}%; }
+`
+
 export const StatBarFill = styled.div<StatBarFillProps>`
   height: 100%;
-  width: ${({ $percentage }) => $percentage}%;
   border-radius: 4px;
   background: var(--accent);
-  transition: width 500ms ease;
+  animation: ${({ $percentage }) => fillBar($percentage)} 300ms ease both;
+  animation-delay: 80ms;
 `
 
 export const StatValue = styled.span`

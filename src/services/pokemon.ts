@@ -146,3 +146,66 @@ export async function getPokemonTypeMap(signal?: AbortSignal): Promise<Map<numbe
 
   return typeMap
 }
+
+/** Attacking-type effectiveness against each defending type (only non-1× entries). */
+const TYPE_EFFECTIVENESS: Record<string, Record<string, number>> = {
+  normal: { rock: 0.5, ghost: 0, steel: 0.5 },
+  fire: { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
+  water: { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },
+  electric: { water: 2, electric: 0.5, grass: 0.5, ground: 0, flying: 2, dragon: 0.5 },
+  grass: { fire: 0.5, water: 2, grass: 0.5, poison: 0.5, ground: 2, flying: 0.5, bug: 0.5, rock: 2, dragon: 0.5, steel: 0.5 },
+  ice: { fire: 0.5, water: 0.5, grass: 2, ice: 0.5, ground: 2, flying: 2, dragon: 2, steel: 0.5 },
+  fighting: { normal: 2, ice: 2, poison: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, rock: 2, ghost: 0, dark: 2, steel: 2, fairy: 0.5 },
+  poison: { grass: 2, poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0, fairy: 2 },
+  ground: { fire: 2, electric: 2, grass: 0.5, poison: 2, flying: 0, bug: 0.5, rock: 2, steel: 2 },
+  flying: { electric: 0.5, grass: 2, fighting: 2, bug: 2, rock: 0.5, steel: 0.5 },
+  psychic: { fighting: 2, poison: 2, psychic: 0.5, dark: 0, steel: 0.5 },
+  bug: { fire: 0.5, grass: 2, fighting: 0.5, poison: 0.5, flying: 0.5, psychic: 2, ghost: 0.5, dark: 2, steel: 0.5, fairy: 0.5 },
+  rock: { fire: 2, ice: 2, fighting: 0.5, ground: 0.5, flying: 2, bug: 2, steel: 0.5 },
+  ghost: { normal: 0, psychic: 2, ghost: 2, dark: 0.5 },
+  dragon: { dragon: 2, steel: 0.5, fairy: 0 },
+  dark: { fighting: 0.5, psychic: 2, ghost: 2, dark: 0.5, fairy: 0.5 },
+  steel: { fire: 0.5, water: 0.5, electric: 0.5, ice: 2, rock: 2, steel: 0.5, fairy: 2 },
+  fairy: { fire: 0.5, poison: 2, steel: 2, dragon: 2 },
+}
+
+export type TypeMatchup = { type: string; multiplier: number; sourceTypes?: string[] }
+
+/**
+ * Given a Pokémon's type names, return the attacking types that are
+ * super-effective (combined multiplier > 1) with their multiplier.
+ */
+export function getTypeWeaknesses(types: string[]): TypeMatchup[] {
+  const results: TypeMatchup[] = []
+  for (const attackType of POKEMON_TYPE_NAMES) {
+    const chart = TYPE_EFFECTIVENESS[attackType]
+    if (!chart) continue
+    const multiplier = types.reduce((m, defType) => m * (chart[defType] ?? 1), 1)
+    if (multiplier > 1) results.push({ type: attackType, multiplier })
+  }
+  return results
+}
+
+/**
+ * Given a Pokémon's type names, return the defending types that
+ * the Pokémon's STAB moves are super-effective against, with their
+ * best multiplier (max across the Pokémon's own types).
+ */
+export function getTypeAdvantages(types: string[]): TypeMatchup[] {
+  const results: TypeMatchup[] = []
+  for (const defType of POKEMON_TYPE_NAMES) {
+    const sourceTypes: string[] = []
+    let best = 0
+    for (const atkType of types) {
+      const chart = TYPE_EFFECTIVENESS[atkType]
+      if (!chart) continue
+      const eff = chart[defType] ?? 1
+      if (eff > 1) {
+        sourceTypes.push(atkType)
+        if (eff > best) best = eff
+      }
+    }
+    if (sourceTypes.length > 0) results.push({ type: defType, multiplier: best, sourceTypes })
+  }
+  return results
+}

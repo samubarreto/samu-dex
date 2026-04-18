@@ -4,13 +4,14 @@ import { Grid } from './styles'
 
 type PokeGridProps = {
   pokemons: PokemonListItem[]
+  typeMap?: Map<number, string[]>
 }
 
-export default function PokeGrid({ pokemons }: PokeGridProps) {
+export default function PokeGrid({ pokemons, typeMap }: PokeGridProps) {
   return (
     <Grid>
       {pokemons.map((pokemon) => (
-        <PokeCard key={pokemon.id} pokemon={pokemon} />
+        <PokeCard key={pokemon.id} pokemon={pokemon} types={typeMap?.get(pokemon.id)} />
       ))}
     </Grid>
   )

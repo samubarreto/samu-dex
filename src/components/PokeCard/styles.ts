@@ -1,5 +1,23 @@
 import { Link } from 'react-router-dom'
-import { styled } from 'styled-components'
+import { styled, keyframes } from 'styled-components'
+
+/* ── Skeleton shimmer ──────────────────────────────── */
+
+const shimmer = keyframes`
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+`
+
+const skeletonBase = `
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-a) 25%,
+    var(--skeleton-b) 50%,
+    var(--skeleton-a) 75%
+  );
+  background-size: 800px 100%;
+  border-radius: var(--radius-sm);
+`
 
 export const Card = styled(Link)`
   position: relative;
@@ -70,20 +88,38 @@ export const FavouriteButton = styled.button<FavouriteButtonProps>`
 `
 
 export const Artwork = styled.div`
+  position: relative;
   aspect-ratio: 1;
   border-radius: var(--radius-md);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(232, 245, 241, 0.7));
+  background: linear-gradient(160deg, var(--artwork-from), var(--artwork-to));
   display: grid;
   place-items: center;
   overflow: hidden;
 `
 
-export const ArtworkImage = styled.img`
+export const ArtworkSkeleton = styled.div`
+  position: absolute;
+  inset: 0;
+  ${skeletonBase}
+  animation: ${shimmer} 1.4s infinite linear;
+  border-radius: var(--radius-md);
+  transition: opacity 300ms ease;
+
+  &[data-hidden='true'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+`
+
+type ArtworkImageProps = { $loaded?: boolean }
+
+export const ArtworkImage = styled.img<ArtworkImageProps>`
   width: min(85%, 160px);
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 12px 20px rgba(24, 44, 53, 0.12));
-  transition: transform 220ms ease;
+  transition: transform 220ms ease, opacity 300ms ease;
+  opacity: ${({ $loaded }) => ($loaded ? 1 : 0)};
 
   ${Card}:hover & {
     transform: scale(1.05);
@@ -92,7 +128,14 @@ export const ArtworkImage = styled.img`
 
 export const Content = styled.div`
   display: grid;
-  gap: 4px;
+  gap: 6px;
+`
+
+export const NameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 `
 
 export const PokemonName = styled.h3`
@@ -106,7 +149,42 @@ export const PokemonName = styled.h3`
   white-space: nowrap;
 `
 
-export const Action = styled.span`
-  color: var(--muted);
-  font-size: 0.88rem;
+export const TypesRow = styled.div`
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+`
+
+type TypeChipProps = { $color: string }
+
+export const TypeChip = styled.span<TypeChipProps>`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  color: #fff;
+  background: ${({ $color }) => $color};
+  line-height: 1.6;
+`
+
+/* ── Skeleton placeholders ─────────────────────────── */
+
+export const SkeletonLine = styled.div<{ $width?: string; $height?: string }>`
+  ${skeletonBase}
+  animation: ${shimmer} 1.4s infinite linear;
+  width: ${({ $width }) => $width ?? '100%'};
+  height: ${({ $height }) => $height ?? '16px'};
+  border-radius: 8px;
+`
+
+export const SkeletonCircle = styled.div<{ $size?: string }>`
+  ${skeletonBase}
+  animation: ${shimmer} 1.4s infinite linear;
+  width: ${({ $size }) => $size ?? '36px'};
+  height: ${({ $size }) => $size ?? '36px'};
+  border-radius: var(--radius-full);
 `

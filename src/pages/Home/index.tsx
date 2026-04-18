@@ -15,8 +15,12 @@ import {
 import type { PokemonListItem, SortDirection, SortField } from '../../types/pokemon'
 import {
   ClearFiltersButton,
+  FiltersContent,
   FiltersHeader,
   FiltersSection,
+  FiltersToggle,
+  FiltersToggleCaret,
+  FiltersToggleLabel,
   Page,
   StateCard,
   StateDescription,
@@ -40,6 +44,7 @@ export default function HomePage() {
   const [selectedClassifications, setSelectedClassifications] = useState<PokemonClassification[]>([])
   const [sortField, setSortField] = useState<SortField>('id')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const deferredSearchValue = useDeferredValue(searchValue)
 
   useEffect(() => {
@@ -203,21 +208,30 @@ export default function HomePage() {
 
       <FiltersSection>
         <FiltersHeader>
-          <span />
+          <FiltersToggle type="button" onClick={() => setFiltersOpen(prev => !prev)}>
+            <FiltersToggleCaret $open={filtersOpen} aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </FiltersToggleCaret>
+            <FiltersToggleLabel>{translate('home.filters.toggle')}</FiltersToggleLabel>
+          </FiltersToggle>
           {isFiltering ? (
             <ClearFiltersButton type="button" onClick={handleClearFilters}>
               {translate('home.filters.clearAll')}
             </ClearFiltersButton>
           ) : null}
         </FiltersHeader>
-        <PokeTypeFilter
-          selectedTypes={selectedTypes}
-          onTypesChange={handleTypesChange}
-        />
-        <PokeClassificationFilter
-          selectedClassifications={selectedClassifications}
-          onClassificationsChange={handleClassificationsChange}
-        />
+        <FiltersContent $open={filtersOpen}>
+          <PokeTypeFilter
+            selectedTypes={selectedTypes}
+            onTypesChange={handleTypesChange}
+          />
+          <PokeClassificationFilter
+            selectedClassifications={selectedClassifications}
+            onClassificationsChange={handleClassificationsChange}
+          />
+        </FiltersContent>
       </FiltersSection>
 
       {isLoading ? (
@@ -243,7 +257,7 @@ export default function HomePage() {
 
       {!isLoading && !hasError && filteredPokemons.length > 0 ? (
         <>
-          <PokeGrid pokemons={visiblePokemons} />
+          <PokeGrid pokemons={visiblePokemons} typeMap={typeMap} />
           <Pagination
             currentPage={currentPage}
             onPageChange={setCurrentPage}
