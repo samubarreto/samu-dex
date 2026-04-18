@@ -1,4 +1,4 @@
-import type { TranslationDictionary } from './types'
+﻿import type { TranslationDictionary } from './types'
 
 const es = {
 	header: {
@@ -9,6 +9,10 @@ const es = {
 			favourites: 'Favoritos',
 			random: 'Aleatorio',
 		},
+		menu: {
+			open: 'Abrir menú',
+			close: 'Cerrar menú',
+		},
 		language: {
 			label: 'Idioma',
 			options: {
@@ -17,6 +21,19 @@ const es = {
 				es: 'Español',
 				it: 'Italiano',
 				ja: 'Japonés',
+			},
+		},
+		theme: {
+			label: 'Tema',
+			options: {
+				light: 'Claro',
+				dark: 'Oscuro',
+				nord_light: 'Nord Light',
+				solarized_light: 'Solarized Light',
+				modern_ink: 'Modern Ink',
+				rose_pine_dawn: 'Rosé Pine Dawn',
+				soaring_skies: 'Soaring Skies',
+				tangerine: 'Tangerine',
 			},
 		},
 	},
@@ -31,6 +48,7 @@ const es = {
 			totalSummary: '{count} Pokémon',
 		},
 		filters: {
+			toggle: 'Filtros',
 			clearAll: 'Limpiar filtros',
 			typeLabel: 'Tipo',
 			classificationLabel: 'Clasificación',
@@ -83,7 +101,7 @@ const es = {
 		},
 	},
 	detailed: {
-		backToHome: '\u2190 Volver al inicio',
+		backToHome: '\u2190 Volver',
 		imageAlt: 'Arte oficial de {name}',
 		addFavourite: 'Agregar a favoritos',
 		removeFavourite: 'Quitar de favoritos',
@@ -99,6 +117,10 @@ const es = {
 			speed: 'Velocidad',
 		},
 		abilities: 'Habilidades',
+		weaknesses: 'Debilidades',
+		advantages: 'Ventaja contra',
+		prev: '← #{id}',
+		next: '#{id} →',
 		status: {
 			loadingTitle: 'Cargando Pokémon...',
 			loadingDescription: 'Obteniendo detalles de la PokeAPI.',
@@ -117,7 +139,20 @@ const es = {
 		code: '404',
 		title: 'Página no encontrada',
 		description: 'La ruta que intentaste acceder no existe.',
-		goHome: 'Volver al inicio',
+		goHome: 'Volver',
+	},
+	routeError: {
+		code: 'Error',
+		title: 'Algo salió mal',
+		description: 'Ocurrió un error inesperado. Inténtalo de nuevo o vuelve a la página de inicio.',
+	},
+	breadcrumb: {
+		label: 'Migas de pan',
+		details: 'Pokémon #{id}',
+		page: 'Página',
+	},
+	copyButton: {
+		copied: '¡Copiado!',
 	},
 	footer: {
 		github: {

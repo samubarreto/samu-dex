@@ -1,4 +1,4 @@
-import type { TranslationDictionary } from './types'
+﻿import type { TranslationDictionary } from './types'
 
 const it = {
 	header: {
@@ -9,6 +9,10 @@ const it = {
 			favourites: 'Preferiti',
 			random: 'Casuale',
 		},
+		menu: {
+			open: 'Apri menu',
+			close: 'Chiudi menu',
+		},
 		language: {
 			label: 'Lingua',
 			options: {
@@ -17,6 +21,19 @@ const it = {
 				es: 'Spagnolo',
 				it: 'Italiano',
 				ja: 'Giapponese',
+			},
+		},
+		theme: {
+			label: 'Tema',
+			options: {
+				light: 'Chiaro',
+				dark: 'Scuro',
+				nord_light: 'Nord Light',
+				solarized_light: 'Solarized Light',
+				modern_ink: 'Modern Ink',
+				rose_pine_dawn: 'Rosé Pine Dawn',
+				soaring_skies: 'Soaring Skies',
+				tangerine: 'Tangerine',
 			},
 		},
 	},
@@ -31,6 +48,7 @@ const it = {
 			totalSummary: '{count} Pokémon',
 		},
 		filters: {
+			toggle: 'Filtri',
 			clearAll: 'Cancella filtri',
 			typeLabel: 'Tipo',
 			classificationLabel: 'Classificazione',
@@ -83,7 +101,7 @@ const it = {
 		},
 	},
 	detailed: {
-		backToHome: '\u2190 Torna alla home',
+		backToHome: '\u2190 Indietro',
 		imageAlt: 'Artwork ufficiale di {name}',
 		addFavourite: 'Aggiungi ai preferiti',
 		removeFavourite: 'Rimuovi dai preferiti',
@@ -99,6 +117,10 @@ const it = {
 			speed: 'Velocità',
 		},
 		abilities: 'Abilità',
+		weaknesses: 'Debolezze',
+		advantages: 'Vantaggio contro',
+		prev: '← #{id}',
+		next: '#{id} →',
 		status: {
 			loadingTitle: 'Caricamento Pokémon...',
 			loadingDescription: 'Recupero dei dettagli dalla PokeAPI.',
@@ -117,7 +139,20 @@ const it = {
 		code: '404',
 		title: 'Pagina non trovata',
 		description: 'La pagina che hai cercato di raggiungere non esiste.',
-		goHome: 'Torna alla home',
+		goHome: 'Indietro',
+	},
+	routeError: {
+		code: 'Errore',
+		title: 'Qualcosa è andato storto',
+		description: 'Si è verificato un errore imprevisto. Riprova o torna alla pagina principale.',
+	},
+	breadcrumb: {
+		label: 'Percorso',
+		details: 'Pokémon #{id}',
+		page: 'Pagina',
+	},
+	copyButton: {
+		copied: 'Copiato!',
 	},
 	footer: {
 		github: {

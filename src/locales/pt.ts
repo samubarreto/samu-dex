@@ -9,6 +9,10 @@ const pt = {
 			favourites: 'Favoritos',
 			random: 'Aleatório',
 		},
+		menu: {
+			open: 'Abrir menu',
+			close: 'Fechar menu',
+		},
 		language: {
 			label: 'Idioma',
 			options: {
@@ -17,6 +21,19 @@ const pt = {
 				es: 'Espanhol',
 				it: 'Italiano',
 				ja: 'Japonês',
+			},
+		},
+		theme: {
+			label: 'Tema',
+			options: {
+				light: 'Claro',
+				dark: 'Escuro',
+				nord_light: 'Nord Light',
+				solarized_light: 'Solarized Light',
+				modern_ink: 'Modern Ink',
+				rose_pine_dawn: 'Rosé Pine Dawn',
+				soaring_skies: 'Soaring Skies',
+				tangerine: 'Tangerine',
 			},
 		},
 	},
@@ -31,6 +48,7 @@ const pt = {
 			totalSummary: '{count} Pokémon',
 		},
 		filters: {
+			toggle: 'Filtros',
 			clearAll: 'Limpar filtros',
 			typeLabel: 'Tipo',
 			classificationLabel: 'Classificação',
@@ -83,7 +101,7 @@ const pt = {
 		},
 	},
 	detailed: {
-		backToHome: '\u2190 Voltar ao início',
+		backToHome: '\u2190 Voltar',
 		imageAlt: 'Arte oficial de {name}',
 		addFavourite: 'Adicionar aos favoritos',
 		removeFavourite: 'Remover dos favoritos',
@@ -99,6 +117,10 @@ const pt = {
 			speed: 'Velocidade',
 		},
 		abilities: 'Habilidades',
+		weaknesses: 'Fraquezas',
+		advantages: 'Vantagem contra',
+		prev: '← #{id}',
+		next: '#{id} →',
 		status: {
 			loadingTitle: 'Carregando Pokémon...',
 			loadingDescription: 'Buscando detalhes na PokeAPI.',
@@ -117,7 +139,20 @@ const pt = {
 		code: '404',
 		title: 'Página não encontrada',
 		description: 'A rota que você tentou acessar não existe.',
-		goHome: 'Voltar ao início',
+		goHome: 'Voltar',
+	},
+	routeError: {
+		code: 'Erro',
+		title: 'Algo deu errado',
+		description: 'Ocorreu um erro inesperado. Tente novamente ou volte para a página inicial.',
+	},
+	breadcrumb: {
+		label: 'Navegação estrutural',
+		details: 'Pokémon #{id}',
+		page: 'Página',
+	},
+	copyButton: {
+		copied: 'Copiado!',
 	},
 	footer: {
 		github: {

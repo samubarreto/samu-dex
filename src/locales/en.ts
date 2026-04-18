@@ -1,4 +1,4 @@
-import type { TranslationDictionary } from './types'
+﻿import type { TranslationDictionary } from './types'
 
 const en = {
 	header: {
@@ -9,6 +9,10 @@ const en = {
 			favourites: 'Favorites',
 			random: 'Random',
 		},
+		menu: {
+			open: 'Open menu',
+			close: 'Close menu',
+		},
 		language: {
 			label: 'Language',
 			options: {
@@ -17,6 +21,19 @@ const en = {
 				es: 'Spanish',
 				it: 'Italian',
 				ja: 'Japanese',
+			},
+		},
+		theme: {
+			label: 'Theme',
+			options: {
+				light: 'Light',
+				dark: 'Dark',
+				nord_light: 'Nord Light',
+				solarized_light: 'Solarized Light',
+				modern_ink: 'Modern Ink',
+				rose_pine_dawn: 'Rosé Pine Dawn',
+				soaring_skies: 'Soaring Skies',
+				tangerine: 'Tangerine',
 			},
 		},
 	},
@@ -31,6 +48,7 @@ const en = {
 			totalSummary: '{count} Pokémon',
 		},
 		filters: {
+			toggle: 'Filters',
 			clearAll: 'Clear filters',
 			typeLabel: 'Type',
 			classificationLabel: 'Classification',
@@ -83,7 +101,7 @@ const en = {
 		},
 	},
 	detailed: {
-		backToHome: '\u2190 Back to home',
+		backToHome: '\u2190 Back',
 		imageAlt: 'Official artwork of {name}',
 		addFavourite: 'Add to favorites',
 		removeFavourite: 'Remove from favorites',
@@ -99,6 +117,10 @@ const en = {
 			speed: 'Speed',
 		},
 		abilities: 'Abilities',
+		weaknesses: 'Weaknesses',
+		advantages: 'Strong against',
+		prev: '← #{id}',
+		next: '#{id} →',
 		status: {
 			loadingTitle: 'Loading Pokémon...',
 			loadingDescription: 'Fetching details from the PokeAPI.',
@@ -117,7 +139,20 @@ const en = {
 		code: '404',
 		title: 'Page not found',
 		description: 'The route you tried to access does not exist.',
-		goHome: 'Back to home',
+		goHome: 'Back',
+	},
+	routeError: {
+		code: 'Error',
+		title: 'Something went wrong',
+		description: 'An unexpected error occurred. Please try again or return to the home page.',
+	},
+	breadcrumb: {
+		label: 'Breadcrumb',
+		details: 'Pokémon #{id}',
+		page: 'Page',
+	},
+	copyButton: {
+		copied: 'Copied!',
 	},
 	footer: {
 		github: {

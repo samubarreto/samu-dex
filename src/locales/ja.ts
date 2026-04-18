@@ -9,6 +9,10 @@ const ja = {
 			favourites: 'お気に入り',
 			random: 'ランダム',
 		},
+		menu: {
+			open: 'メニューを開く',
+			close: 'メニューを閉じる',
+		},
 		language: {
 			label: '言語',
 			options: {
@@ -17,6 +21,19 @@ const ja = {
 				es: 'スペイン語',
 				it: 'イタリア語',
 				ja: '日本語',
+			},
+		},
+		theme: {
+			label: 'テーマ',
+			options: {
+				light: 'ライト',
+				dark: 'ダーク',
+				nord_light: 'Nord Light',
+				solarized_light: 'Solarized Light',
+				modern_ink: 'Modern Ink',
+				rose_pine_dawn: 'Rosé Pine Dawn',
+				soaring_skies: 'Soaring Skies',
+				tangerine: 'Tangerine',
 			},
 		},
 	},
@@ -31,6 +48,7 @@ const ja = {
 			totalSummary: '{count}匹のポケモン',
 		},
 		filters: {
+			toggle: 'フィルター',
 			clearAll: 'フィルターをクリア',
 			typeLabel: 'タイプ',
 			classificationLabel: '分類',
@@ -83,7 +101,7 @@ const ja = {
 		},
 	},
 	detailed: {
-		backToHome: '← ホームに戻る',
+		backToHome: '← 戻る',
 		imageAlt: '{name}の公式アート',
 		addFavourite: 'お気に入りに追加',
 		removeFavourite: 'お気に入りから削除',
@@ -99,6 +117,10 @@ const ja = {
 			speed: 'すばやさ',
 		},
 		abilities: '特性',
+		weaknesses: '弱点',
+		advantages: '有利な相手',
+		prev: '← #{id}',
+		next: '#{id} →',
 		status: {
 			loadingTitle: 'ポケモンを読み込み中...',
 			loadingDescription: 'PokeAPIから詳細を取得しています。',
@@ -117,7 +139,20 @@ const ja = {
 		code: '404',
 		title: 'ページが見つかりません',
 		description: 'アクセスしようとしたルートは存在しません。',
-		goHome: 'ホームに戻る',
+		goHome: '戻る',
+	},
+	routeError: {
+		code: 'エラー',
+		title: '予期しないエラーが発生しました',
+		description: '問題が発生しました。もう一度お試しいただくか、ホームページに戻ってください。',
+	},
+	breadcrumb: {
+		label: 'パンくずリスト',
+		details: 'ポケモン #{id}',
+		page: 'ページ',
+	},
+	copyButton: {
+		copied: 'コピーしました！',
 	},
 	footer: {
 		github: {
