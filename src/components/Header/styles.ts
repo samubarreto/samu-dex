@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
-import { styled } from 'styled-components'
+import { styled, css, keyframes } from 'styled-components'
+
+/* ── Container ─────────────────────────────────────── */
 
 export const Container = styled.header`
   position: sticky;
   top: 0;
   z-index: 20;
   border-bottom: 1px solid var(--border);
-  background: rgba(245, 240, 232, 0.82);
+  background: var(--glass);
   backdrop-filter: blur(20px) saturate(1.4);
 `
 
@@ -19,10 +21,8 @@ export const Inner = styled.div`
   justify-content: space-between;
   gap: 16px;
 
-  @media (max-width: 860px) {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 16px;
+  @media (max-width: 768px) {
+    padding: 12px 16px;
   }
 `
 
@@ -36,6 +36,51 @@ export const BrandLink = styled(Link)`
   letter-spacing: -0.03em;
 `
 
+/* ── Hamburger button (mobile only) ────────────────── */
+
+export const ThemeDropdown = styled.div`
+  position: relative;
+`
+
+export const ThemeColorDot = styled.span`
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+`
+
+export const HamburgerButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+
+  &:hover {
+    box-shadow: var(--shadow-soft);
+  }
+`
+
+export const MobileActions = styled.div`
+  display: none;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`
+
+/* ── Desktop actions (hidden on mobile) ────────────── */
+
 export const Actions = styled.div`
   display: flex;
   align-items: center;
@@ -43,8 +88,8 @@ export const Actions = styled.div`
   gap: 12px;
   flex-wrap: wrap;
 
-  @media (max-width: 860px) {
-    width: 100%;
+  @media (max-width: 768px) {
+    display: none;
   }
 `
 
@@ -53,11 +98,210 @@ export const Navigation = styled.nav`
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+`
 
-  @media (max-width: 480px) {
-    gap: 8px;
-    width: 100%;
+/* ── Mobile drawer ─────────────────────────────────── */
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to   { opacity: 1; }
+`
+
+const slideIn = keyframes`
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+`
+
+type MobileOverlayProps = { $open: boolean }
+
+export const MobileOverlay = styled.div<MobileOverlayProps>`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: ${({ $open }) => ($open ? 'block' : 'none')};
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(0, 0, 0, 0.35);
+    animation: ${fadeIn} 200ms ease;
   }
+`
+
+type MobileDrawerProps = { $open: boolean }
+
+export const MobileDrawer = styled.div<MobileDrawerProps>`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: ${({ $open }) => ($open ? 'flex' : 'none')};
+    flex-direction: column;
+    gap: 8px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    width: min(300px, 80vw);
+    padding: 20px;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    animation: ${slideIn} 250ms ease;
+  }
+`
+
+export const DrawerCloseButton = styled.button`
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: background-color 160ms ease;
+
+  &:hover {
+    box-shadow: var(--shadow-soft);
+  }
+`
+
+export const DrawerNav = styled.nav`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const drawerItemStyles = css`
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: var(--surface-strong);
+    color: var(--text);
+  }
+`
+
+type DrawerNavLinkProps = { $active?: boolean }
+
+export const DrawerNavLink = styled(Link) <DrawerNavLinkProps>`
+  ${drawerItemStyles}
+
+  ${({ $active }) =>
+    $active
+      ? css`
+          color: var(--text);
+          background: var(--surface-strong);
+          font-weight: 600;
+        `
+      : ''}
+`
+
+export const DrawerRandomButton = styled.button`
+  ${drawerItemStyles}
+  cursor: pointer;
+`
+
+export const DrawerExternalLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+export const DrawerExternalLink = styled.a`
+  ${drawerItemStyles}
+  justify-content: flex-start;
+  gap: 12px;
+`
+
+export const DrawerExternalIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+`
+
+export const DrawerDivider = styled.hr`
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 8px 0;
+`
+
+/* ── Breadcrumbs ───────────────────────────────────── */
+
+export const BreadcrumbBar = styled.nav`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--glass-subtle);
+  }
+`
+
+export const BreadcrumbExternalLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 160ms ease;
+  padding: 2px;
+
+  &:hover {
+    color: var(--accent);
+  }
+`
+
+export const BreadcrumbActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+`
+
+export const BreadcrumbLink = styled(Link)`
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
+export const BreadcrumbSeparator = styled.span`
+  color: var(--muted);
+  user-select: none;
+`
+
+export const BreadcrumbCurrent = styled.span`
+  color: var(--text);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
 `
 
 type NavigationItemProps = {
@@ -71,8 +315,8 @@ const interactiveItemStyles = `
   min-height: 44px;
   padding: 0 16px;
   border-radius: 999px;
-  border: 1px solid rgba(34, 49, 63, 0.1);
-  background: rgba(255, 250, 244, 0.78);
+  border: 1px solid var(--border);
+  background: var(--surface-item);
   color: var(--muted);
   text-decoration: none;
   transition:
@@ -90,7 +334,7 @@ const interactiveItemStyles = `
   }
 `
 
-export const NavigationLink = styled(Link)<NavigationItemProps>`
+export const NavigationLink = styled(Link) <NavigationItemProps>`
   ${interactiveItemStyles}
 
   ${({ $active }) =>
