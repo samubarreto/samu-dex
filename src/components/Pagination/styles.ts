@@ -12,6 +12,15 @@ export const Container = styled.nav`
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+
+  @media (max-width: 480px) {
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+    gap: 10px;
+  }
 `
 
 export const Summary = styled.p`
@@ -24,6 +33,11 @@ export const Controls = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+
+  @media (max-width: 480px) {
+    gap: 6px;
+    justify-content: center;
+  }
 `
 
 export const PageButton = styled.button<PageButtonProps>`
@@ -51,6 +65,13 @@ export const PageButton = styled.button<PageButtonProps>`
     transform: translateY(-1px);
     border-color: var(--border);
   }
+
+  @media (max-width: 480px) {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    font-size: 0.82rem;
+  }
 `
 
 export const Ellipsis = styled.span`
@@ -60,4 +81,9 @@ export const Ellipsis = styled.span`
   align-items: center;
   justify-content: center;
   color: var(--muted);
+
+  @media (max-width: 480px) {
+    min-width: 28px;
+    height: 36px;
+  }
 `

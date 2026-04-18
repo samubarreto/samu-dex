@@ -1,21 +1,22 @@
-import axios from 'axios'
 import { useDeferredValue, useEffect, useMemo, useState } from 'react'
-import type { NamedAPIResource, NamedAPIResourceList } from 'pokenode-ts'
 import Pagination from '../../components/Pagination'
+import PokeClassificationFilter from '../../components/PokeClassificationFilter'
 import PokeGrid from '../../components/PokeGrid'
+import PokeTypeFilter from '../../components/PokeTypeFilter'
 import SearchBar from '../../components/SearchBar'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PokemonListItem } from '../../types/pokemon'
+import { isRequestCanceled } from '../../services/http'
 import {
-  Eyebrow,
-  Hero,
-  HeroMetric,
-  HeroMetricLabel,
-  HeroMetricValue,
-  HeroMetrics,
-  HeroPanel,
-  HeroSubtitle,
-  HeroTitle,
+  type PokemonClassification,
+  getPokemonClassification,
+  getPokemonList,
+  getPokemonTypeMap,
+} from '../../services/pokemon'
+import type { PokemonListItem, SortDirection, SortField } from '../../types/pokemon'
+import {
+  ClearFiltersButton,
+  FiltersHeader,
+  FiltersSection,
   Page,
   StateCard,
   StateDescription,
@@ -24,45 +25,21 @@ import {
 
 const DEFAULT_ITEMS_PER_PAGE = 50
 const MAX_ITEMS_PER_PAGE = 500
-const POKEMON_ENDPOINT = 'https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0'
-
-function extractPokemonId(url: string) {
-  const idSegment = url.split('/').filter(Boolean).at(-1)
-
-  return idSegment ? Number(idSegment) : Number.NaN
-}
-
-function buildPokemonImageUrl(id: number) {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
-}
-
-function mapPokemonResults(results: NamedAPIResource[]): PokemonListItem[] {
-  return results.flatMap((pokemon) => {
-    const id = extractPokemonId(pokemon.url)
-
-    if (!Number.isFinite(id)) {
-      return []
-    }
-
-    return [
-      {
-        ...pokemon,
-        id,
-        imageUrl: buildPokemonImageUrl(id),
-      },
-    ]
-  })
-}
 
 export default function HomePage() {
   const { translate } = useTranslation()
   const [pokemons, setPokemons] = useState<PokemonListItem[]>([])
+  const [typeMap, setTypeMap] = useState<Map<number, string[]>>(new Map())
   const [searchValue, setSearchValue] = useState('')
   const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_ITEMS_PER_PAGE)
   const [itemsPerPageInput, setItemsPerPageInput] = useState(String(DEFAULT_ITEMS_PER_PAGE))
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedClassifications, setSelectedClassifications] = useState<PokemonClassification[]>([])
+  const [sortField, setSortField] = useState<SortField>('id')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const deferredSearchValue = useDeferredValue(searchValue)
 
   useEffect(() => {
@@ -73,13 +50,15 @@ export default function HomePage() {
       setHasError(false)
 
       try {
-        const { data } = await axios.get<NamedAPIResourceList>(POKEMON_ENDPOINT, {
-          signal: controller.signal,
-        })
+        const [nextPokemons, nextTypeMap] = await Promise.all([
+          getPokemonList(controller.signal),
+          getPokemonTypeMap(controller.signal).catch(() => new Map<number, string[]>()),
+        ])
 
-        setPokemons(mapPokemonResults(data.results))
+        setPokemons(nextPokemons)
+        setTypeMap(nextTypeMap)
       } catch (error) {
-        if (axios.isAxiosError(error) && error.code === 'ERR_CANCELED') {
+        if (isRequestCanceled(error)) {
           return
         }
 
@@ -97,19 +76,41 @@ export default function HomePage() {
   }, [])
 
   const filteredPokemons = useMemo(() => {
+    let result = pokemons
+
     const normalizedQuery = deferredSearchValue.trim().toLowerCase()
 
-    if (!normalizedQuery) {
-      return pokemons
+    if (normalizedQuery) {
+      result = result.filter((pokemon) => {
+        const matchesName = pokemon.name.toLowerCase().includes(normalizedQuery)
+        const matchesId = String(pokemon.id).includes(normalizedQuery)
+
+        return matchesName || matchesId
+      })
     }
 
-    return pokemons.filter((pokemon) => {
-      const matchesName = pokemon.name.toLowerCase().includes(normalizedQuery)
-      const matchesId = String(pokemon.id).includes(normalizedQuery)
+    if (selectedTypes.length > 0) {
+      result = result.filter((pokemon) => {
+        const pokemonTypes = typeMap.get(pokemon.id) ?? []
 
-      return matchesName || matchesId
+        return selectedTypes.some((type) => pokemonTypes.includes(type))
+      })
+    }
+
+    if (selectedClassifications.length > 0) {
+      result = result.filter((pokemon) => {
+        return selectedClassifications.includes(getPokemonClassification(pokemon.id, pokemon.name))
+      })
+    }
+
+    return [...result].sort((a, b) => {
+      const comparison = sortField === 'id'
+        ? a.id - b.id
+        : a.name.localeCompare(b.name)
+
+      return sortDirection === 'asc' ? comparison : -comparison
     })
-  }, [deferredSearchValue, pokemons])
+  }, [deferredSearchValue, pokemons, selectedTypes, typeMap, selectedClassifications, sortField, sortDirection])
 
   const totalPages = Math.max(1, Math.ceil(filteredPokemons.length / itemsPerPage))
 
@@ -152,38 +153,72 @@ export default function HomePage() {
     setCurrentPage(1)
   }
 
+  const handleSortChange = (field: SortField) => {
+    if (field === sortField) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+
+    setCurrentPage(1)
+  }
+
+  const handleTypesChange = (types: string[]) => {
+    setSelectedTypes(types)
+    setCurrentPage(1)
+  }
+
+  const handleClassificationsChange = (classifications: PokemonClassification[]) => {
+    setSelectedClassifications(classifications)
+    setCurrentPage(1)
+  }
+
+  const handleClearFilters = () => {
+    setSearchValue('')
+    setSelectedTypes([])
+    setSelectedClassifications([])
+    setSortField('id')
+    setSortDirection('asc')
+    setCurrentPage(1)
+  }
+
+  const isFiltering = deferredSearchValue.trim() !== '' || selectedTypes.length > 0 || selectedClassifications.length > 0
+
   return (
     <Page>
-      <Hero>
-        <HeroPanel>
-          <Eyebrow>{translate('home.hero.eyebrow')}</Eyebrow>
-          <HeroTitle>{translate('home.hero.title')}</HeroTitle>
-          <HeroSubtitle>{translate('home.hero.subtitle')}</HeroSubtitle>
-        </HeroPanel>
-
-        <HeroPanel>
-          <HeroMetrics>
-            <HeroMetric>
-              <HeroMetricValue>{pokemons.length}</HeroMetricValue>
-              <HeroMetricLabel>{translate('home.controls.totalLoadedLabel')}</HeroMetricLabel>
-            </HeroMetric>
-            <HeroMetric>
-              <HeroMetricValue>{filteredPokemons.length}</HeroMetricValue>
-              <HeroMetricLabel>{translate('home.controls.filteredLabel')}</HeroMetricLabel>
-            </HeroMetric>
-          </HeroMetrics>
-        </HeroPanel>
-      </Hero>
-
       <SearchBar
         filteredCount={filteredPokemons.length}
+        isFiltering={isFiltering}
         itemsPerPageValue={itemsPerPageInput}
         onItemsPerPageBlur={handleItemsPerPageBlur}
         onItemsPerPageChange={handleItemsPerPageChange}
         onSearchChange={handleSearchChange}
+        onSortChange={handleSortChange}
         searchValue={searchValue}
-        totalLoaded={pokemons.length}
+        sortDirection={sortDirection}
+        sortField={sortField}
+        totalCount={pokemons.length}
       />
+
+      <FiltersSection>
+        <FiltersHeader>
+          <span />
+          {isFiltering ? (
+            <ClearFiltersButton type="button" onClick={handleClearFilters}>
+              {translate('home.filters.clearAll')}
+            </ClearFiltersButton>
+          ) : null}
+        </FiltersHeader>
+        <PokeTypeFilter
+          selectedTypes={selectedTypes}
+          onTypesChange={handleTypesChange}
+        />
+        <PokeClassificationFilter
+          selectedClassifications={selectedClassifications}
+          onClassificationsChange={handleClassificationsChange}
+        />
+      </FiltersSection>
 
       {isLoading ? (
         <StateCard aria-live="polite" role="status">

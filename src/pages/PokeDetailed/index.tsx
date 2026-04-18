@@ -1,9 +1,14 @@
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { Pokemon } from 'pokenode-ts'
 import { useFavourites } from '../../hooks/useFavourites'
 import { useTranslation } from '../../hooks/useTranslation'
+import { isRequestCanceled } from '../../services/http'
+import {
+  buildPokemonArtworkUrl,
+  getPokemonById,
+  toPokemonListItem,
+} from '../../services/pokemon'
 import type { PokemonListItem } from '../../types/pokemon'
 import {
   AbilitiesList,
@@ -37,8 +42,6 @@ import {
   TypesRow,
 } from './styles'
 
-const POKEMON_API = 'https://pokeapi.co/api/v2/pokemon'
-
 const typeColors: Record<string, string> = {
   normal: '#A8A77A',
   fire: '#EE8130',
@@ -69,10 +72,6 @@ const statKeys: Record<string, string> = {
   speed: 'detailed.stats.speed',
 }
 
-function buildArtworkUrl(id: number) {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
-}
-
 function formatName(name: string) {
   return name.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
@@ -97,6 +96,8 @@ export default function PokeDetailedPage() {
       return
     }
 
+    const resolvedPokemonId = pokemonId
+
     const controller = new AbortController()
 
     async function load() {
@@ -104,14 +105,11 @@ export default function PokeDetailedPage() {
       setHasError(false)
 
       try {
-        const { data } = await axios.get<Pokemon>(
-          `${POKEMON_API}/${pokemonId}`,
-          { signal: controller.signal },
-        )
+        const nextPokemon = await getPokemonById(resolvedPokemonId, controller.signal)
 
-        setPokemon(data)
+        setPokemon(nextPokemon)
       } catch (error) {
-        if (axios.isAxiosError(error) && error.code === 'ERR_CANCELED') {
+        if (isRequestCanceled(error)) {
           return
         }
 
@@ -129,12 +127,7 @@ export default function PokeDetailedPage() {
   }, [pokemonId, numericId])
 
   const listItem: PokemonListItem | null = pokemon
-    ? {
-        name: pokemon.name,
-        url: `${POKEMON_API}/${pokemon.id}`,
-        id: pokemon.id,
-        imageUrl: buildArtworkUrl(pokemon.id),
-      }
+    ? toPokemonListItem(pokemon)
     : null
 
   const favourite = listItem ? isFavourite(pokemon!.id) : false
@@ -177,7 +170,7 @@ export default function PokeDetailedPage() {
         <ArtworkPanel>
           <Artwork>
             <ArtworkImage
-              src={buildArtworkUrl(pokemon.id)}
+              src={buildPokemonArtworkUrl(pokemon.id)}
               alt={translate('detailed.imageAlt', { params: { name: formatName(pokemon.name) } })}
             />
           </Artwork>

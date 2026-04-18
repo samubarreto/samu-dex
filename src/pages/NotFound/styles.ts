@@ -18,6 +18,10 @@ export const Card = styled.div`
   text-align: center;
   justify-items: center;
   max-width: 480px;
+
+  @media (max-width: 480px) {
+    padding: 32px 20px;
+  }
 `
 
 export const Code = styled.p`

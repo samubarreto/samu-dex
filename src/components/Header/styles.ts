@@ -53,6 +53,11 @@ export const Navigation = styled.nav`
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    gap: 8px;
+    width: 100%;
+  }
 `
 
 type NavigationItemProps = {
@@ -177,6 +182,12 @@ export const DropdownMenu = styled.ul<DropdownMenuProps>`
     opacity 180ms ease,
     visibility 180ms ease,
     transform 180ms ease;
+
+  @media (max-width: 480px) {
+    right: auto;
+    left: 0;
+    min-width: 180px;
+  }
 `
 
 type DropdownItemProps = {

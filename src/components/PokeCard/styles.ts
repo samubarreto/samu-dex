@@ -23,6 +23,12 @@ export const Card = styled(Link)`
     border-color: rgba(15, 123, 108, 0.18);
     box-shadow: var(--shadow);
   }
+
+  @media (max-width: 540px) {
+    gap: 10px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+  }
 `
 
 export const CardHeader = styled.div`
@@ -95,6 +101,9 @@ export const PokemonName = styled.h3`
   font-weight: 700;
   color: var(--text);
   text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 export const Action = styled.span`

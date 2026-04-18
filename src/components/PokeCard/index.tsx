@@ -1,4 +1,4 @@
-import { type MouseEvent } from 'react'
+import { type MouseEvent, useState } from 'react'
 import { useFavourites } from '../../hooks/useFavourites'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { PokemonListItem } from '../../types/pokemon'
@@ -31,8 +31,13 @@ function formatPokemonCode(id: number) {
 export default function PokeCard({ pokemon }: PokeCardProps) {
   const { translate } = useTranslation()
   const { isFavourite, toggleFavourite } = useFavourites()
+  const [imageError, setImageError] = useState(false)
   const displayName = formatPokemonName(pokemon.name)
   const favourite = isFavourite(pokemon.id)
+
+  if (imageError) {
+    return null
+  }
 
   const handleToggleFavourite = (event: MouseEvent) => {
     event.preventDefault()
@@ -67,6 +72,7 @@ export default function PokeCard({ pokemon }: PokeCardProps) {
           alt={translate('home.grid.imageAlt', { params: { name: displayName } })}
           loading="lazy"
           src={pokemon.imageUrl}
+          onError={() => setImageError(true)}
         />
       </Artwork>
 

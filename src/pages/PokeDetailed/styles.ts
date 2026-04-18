@@ -44,6 +44,10 @@ export const ArtworkPanel = styled.div`
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+
+  @media (max-width: 480px) {
+    padding: 20px;
+  }
 `
 
 export const Artwork = styled.div`
@@ -173,6 +177,10 @@ export const Section = styled.section`
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+
+  @media (max-width: 480px) {
+    padding: 16px;
+  }
 `
 
 export const SectionTitle = styled.h2`
@@ -249,6 +257,10 @@ export const StateCard = styled.section`
   box-shadow: var(--shadow-soft);
   text-align: center;
   justify-items: center;
+
+  @media (max-width: 480px) {
+    padding: 32px 20px;
+  }
 `
 
 export const StateTitle = styled.h2`

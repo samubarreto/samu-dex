@@ -35,6 +35,10 @@ export const EmptyCard = styled.section`
   box-shadow: var(--shadow-soft);
   text-align: center;
   justify-items: center;
+
+  @media (max-width: 480px) {
+    padding: 32px 20px;
+  }
 `
 
 export const EmptyTitle = styled.h2`

@@ -1,34 +1,44 @@
 import { useTranslation } from '../../hooks/useTranslation'
+import type { SortDirection, SortField } from '../../types/pokemon'
 import {
   Container,
   Field,
   Fields,
-  Hint,
   Label,
   PageSizeInput,
+  ResultCount,
   SearchInput,
-  Stat,
-  Stats,
+  SortButton,
+  SortGroup,
+  Toolbar,
 } from './styles'
 
 type SearchBarProps = {
   filteredCount: number
+  isFiltering: boolean
   itemsPerPageValue: string
   onItemsPerPageBlur: () => void
   onItemsPerPageChange: (value: string) => void
   onSearchChange: (value: string) => void
+  onSortChange: (field: SortField) => void
   searchValue: string
-  totalLoaded: number
+  sortDirection: SortDirection
+  sortField: SortField
+  totalCount: number
 }
 
 export default function SearchBar({
   filteredCount,
+  isFiltering,
   itemsPerPageValue,
   onItemsPerPageBlur,
   onItemsPerPageChange,
   onSearchChange,
+  onSortChange,
   searchValue,
-  totalLoaded,
+  sortDirection,
+  sortField,
+  totalCount,
 }: SearchBarProps) {
   const { translate } = useTranslation()
 
@@ -44,7 +54,6 @@ export default function SearchBar({
             value={searchValue}
             onChange={(event) => onSearchChange(event.target.value)}
           />
-          <Hint>{translate('home.controls.searchHint')}</Hint>
         </Field>
 
         <Field>
@@ -62,16 +71,31 @@ export default function SearchBar({
         </Field>
       </Fields>
 
-      <Stats>
-        <Stat>
-          <strong>{totalLoaded}</strong>
-          <span>{translate('home.controls.totalLoadedLabel')}</span>
-        </Stat>
-        <Stat>
-          <strong>{filteredCount}</strong>
-          <span>{translate('home.controls.filteredLabel')}</span>
-        </Stat>
-      </Stats>
+      <Toolbar>
+        <SortGroup>
+          <Label as="span">{translate('home.controls.sortLabel')}</Label>
+          <SortButton
+            type="button"
+            $active={sortField === 'id'}
+            onClick={() => onSortChange('id')}
+          >
+            ID {sortField === 'id' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+          </SortButton>
+          <SortButton
+            type="button"
+            $active={sortField === 'name'}
+            onClick={() => onSortChange('name')}
+          >
+            {translate('home.controls.sortName')} {sortField === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+          </SortButton>
+        </SortGroup>
+
+        <ResultCount>
+          {isFiltering
+            ? translate('home.controls.filteredSummary', { params: { count: filteredCount, total: totalCount } })
+            : translate('home.controls.totalSummary', { params: { count: totalCount } })}
+        </ResultCount>
+      </Toolbar>
     </Container>
   )
 }
