@@ -394,7 +394,7 @@ export default function Header() {
 
         <DrawerExternalLinks>
           <DrawerExternalLink
-            href="https://github.com/samubarreto"
+            href="https://github.com/samubarreto/samu-dex"
             target="_blank"
             rel="noreferrer"
             aria-label={translate('footer.github.ariaLabel')}
@@ -543,7 +543,7 @@ export default function Header() {
 
           <BreadcrumbActions>
             <BreadcrumbExternalLink
-              href="https://github.com/samubarreto"
+              href="https://github.com/samubarreto/samu-dex"
               target="_blank"
               rel="noreferrer"
               aria-label={translate('footer.github.ariaLabel')}

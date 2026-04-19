@@ -27,7 +27,7 @@ export default function Footer() {
     <Container>
       <Inner>
         <ExternalLink
-          href="https://github.com/samubarreto"
+          href="https://github.com/samubarreto/samu-dex"
           target="_blank"
           rel="noreferrer"
           aria-label={translate('footer.github.ariaLabel')}
