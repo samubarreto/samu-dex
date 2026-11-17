@@ -1,3 +1,6 @@
+- https://samu-dex-eta.vercel.app/
+- https://samubarreto.github.io/samu-dex/
+
 # Samudex
 
 - Frontend de Pokedéx vibecodada desnecessariamente cheia de funcionalidades
