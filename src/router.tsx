@@ -34,5 +34,5 @@ export const router = createBrowserRouter([
     ],
   },
 ], {
-  basename: '/samu-dex/'
+  basename: import.meta.env.BASE_URL
 })
